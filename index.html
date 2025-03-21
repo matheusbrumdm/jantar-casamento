@@ -99,13 +99,14 @@
   </div>
 
   <script>
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbzf0UVXAoGvuseDDvP9FBUbxudrPuSJvUxZPodaypD54QdC4nj46pEf1Y1jvD0dfKjP/exec";
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbxWsxGetsVt1sgAOm_fu2rDUAFpAJKU4P2es5YGUeFXnX3Omc94dR7FNjcdwYubAF7n/exec";
 
     function pesquisarConvites() {
       const nome = document.getElementById("nomeInput").value;
       fetch(webAppUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        mode: "cors", // Permite comunicação entre domínios diferentes
         body: JSON.stringify({ action: "validarNome", nome: nome })
       })
       .then(res => res.json())
@@ -125,6 +126,7 @@
       fetch(webAppUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        mode: "cors",
         body: JSON.stringify({ action: "validarTelefone", nome: document.getElementById("NomeConvites").value, telefone: telefone })
       })
       .then(res => res.json())
@@ -159,6 +161,7 @@
       fetch(webAppUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        mode: "cors",
         body: JSON.stringify(dados)
       })
       .then(res => res.json())
@@ -178,6 +181,7 @@
       document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
     }
 </script>
+
 
 </body>
 </html>
