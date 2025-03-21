@@ -99,8 +99,7 @@
   </div>
 
   <script>
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbxXQ59dHxR58wHXdcJfHo2Kulh6RcTmO1O1_aZ5tLLVXUTWgJ8FT2CWp4t2__oV74Xz/exec";
-    let nomeSelecionado = "";
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbyxpIXWJ4ADgOIalXUKuzM5CfBGy1G923jOYnTVV3sXp_bivJ3QkgulAFHKBpZ3zzbz/exec";
 
     function pesquisarConvites() {
       const nome = document.getElementById("nomeInput").value;
@@ -112,17 +111,13 @@
       .then(res => res.json())
       .then(data => {
         if (data.status === "success") {
-          nomeSelecionado = data.nome;
           document.getElementById("NomeConvites").innerHTML = `<option value="${data.nome}">${data.nome}</option>`;
           document.getElementById("conviteDiv").style.display = "block";
         } else {
           alert("Convite não encontrado.");
         }
-      });
-    }
-
-    function confirmarConvite() {
-      document.getElementById("telefoneDiv").style.display = "block";
+      })
+      .catch(error => console.error("Erro:", error));
     }
 
     function validarTelefone() {
@@ -130,7 +125,7 @@
       fetch(webAppUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "validarTelefone", nome: nomeSelecionado, telefone: telefone })
+        body: JSON.stringify({ action: "validarTelefone", nome: document.getElementById("NomeConvites").value, telefone: telefone })
       })
       .then(res => res.json())
       .then(data => {
@@ -139,7 +134,8 @@
         } else {
           alert("Telefone inválido.");
         }
-      });
+      })
+      .catch(error => console.error("Erro:", error));
     }
 
     function enviarDados() {
@@ -154,7 +150,7 @@
 
       const dados = {
         action: "salvarResposta",
-        nome: nomeSelecionado,
+        nome: document.getElementById("NomeConvites").value,
         jantar: jantar.value,
         bebidaAlcoolica: bebidaAlcoolica.value,
         bebidaNaoAlcoolica: bebidaNaoAlcoolica.value
@@ -169,7 +165,8 @@
       .then(data => {
         alert(data.message || "Resposta enviada!");
         limparFormulario();
-      });
+      })
+      .catch(error => console.error("Erro:", error));
     }
 
     function limparFormulario() {
@@ -180,6 +177,7 @@
       document.getElementById("telefoneInput").value = "";
       document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
     }
-  </script>
+</script>
+
 </body>
 </html>
