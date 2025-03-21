@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #f8f8f8;
+      margin: 0;
+      padding: 0;
+      text-align: left;
+    }
+    .header {
+      width: 100%;
+      height: 200px;
+      background-image: url('https://i.postimg.cc/NMDd5BwN/Evento.png');
+      background-size: cover;
+      background-position: center;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    input, select, button {
+      font-size: 14px;
+      padding: 6px;
+      margin: 4px 0;
+      width: 100%;
+      max-width: 280px;
+    }
+    button {
+      background-color: #6d8259;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      padding: 8px;
+    }
+    button:hover {
+      background-color: #4d603b;
+    }
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header"></div>
+  <div class="container">
+    <h2>Digite seu nome para encontrar seu convite</h2>
+    <input type="text" id="nomeInput" placeholder="Digite seu primeiro nome">
+    <button onclick="pesquisarConvites()">Pesquisar</button>
+
+    <div id="conviteDiv" style="display: none;">
+      <h3>Selecione seu convite</h3>
+      <select id="NomeConvites"></select>
+      <br>
+      <button onclick="confirmarConvite()">Continuar</button>
+    </div>
+
+    <div id="telefoneDiv" style="display: none;">
+      <h3>Confirme com os 4 últimos dígitos do celular</h3>
+      <input type="text" id="telefoneInput" placeholder="Ex: 1234" maxlength="4">
+      <button onclick="validarTelefone()">Validar e Continuar</button>
+    </div>
+
+    <div id="formularioDiv" style="display: none;">
+      <h3>Para o Jantar</h3>
+      <div class="radio-group">
+        <label><input type="radio" name="jantar" value="Tal e tal..."> Opção 1 - Tal e tal...</label>
+        <label><input type="radio" name="jantar" value="Pa e bola..."> Opção 2 - Pa e bola...</label>
+      </div>
+
+      <h3>Bebidas Alcoólicas</h3>
+      <div class="radio-group">
+        <label><input type="radio" name="bebidaAlcoolica" value="Cerveja"> Cerveja</label>
+        <label><input type="radio" name="bebidaAlcoolica" value="Vinho Tinto"> Vinho Tinto</label>
+        <label><input type="radio" name="bebidaAlcoolica" value="Vinho Branco"> Vinho Branco</label>
+      </div>
+
+      <h3>Bebidas Não Alcoólicas</h3>
+      <div class="radio-group">
+        <label><input type="radio" name="bebidaNaoAlcoolica" value="Refrigerante"> Refrigerante</label>
+        <label><input type="radio" name="bebidaNaoAlcoolica" value="Suco"> Suco</label>
+        <label><input type="radio" name="bebidaNaoAlcoolica" value="Agua Sem Gas"> Água Sem Gás</label>
+        <label><input type="radio" name="bebidaNaoAlcoolica" value="Agua Com Gas"> Água Com Gás</label>
+      </div>
+      <button onclick="enviarDados()">Enviar Resposta</button>
+    </div>
+  </div>
+
+  <script>
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbxXQ59dHxR58wHXdcJfHo2Kulh6RcTmO1O1_aZ5tLLVXUTWgJ8FT2CWp4t2__oV74Xz/exec";
+    let nomeSelecionado = "";
+
+    function pesquisarConvites() {
+      const nome = document.getElementById("nomeInput").value;
+      fetch(webAppUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "validarNome", nome: nome })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          nomeSelecionado = data.nome;
+          document.getElementById("NomeConvites").innerHTML = `<option value="${data.nome}">${data.nome}</option>`;
+          document.getElementById("conviteDiv").style.display = "block";
+        } else {
+          alert("Convite não encontrado.");
+        }
+      });
+    }
+
+    function confirmarConvite() {
+      document.getElementById("telefoneDiv").style.display = "block";
+    }
+
+    function validarTelefone() {
+      const telefone = document.getElementById("telefoneInput").value;
+      fetch(webAppUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "validarTelefone", nome: nomeSelecionado, telefone: telefone })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          document.getElementById("formularioDiv").style.display = "block";
+        } else {
+          alert("Telefone inválido.");
+        }
+      });
+    }
+
+    function enviarDados() {
+      const jantar = document.querySelector('input[name="jantar"]:checked');
+      const bebidaAlcoolica = document.querySelector('input[name="bebidaAlcoolica"]:checked');
+      const bebidaNaoAlcoolica = document.querySelector('input[name="bebidaNaoAlcoolica"]:checked');
+
+      if (!jantar || !bebidaAlcoolica || !bebidaNaoAlcoolica) {
+        alert("Selecione todas as opções antes de enviar.");
+        return;
+      }
+
+      const dados = {
+        action: "salvarResposta",
+        nome: nomeSelecionado,
+        jantar: jantar.value,
+        bebidaAlcoolica: bebidaAlcoolica.value,
+        bebidaNaoAlcoolica: bebidaNaoAlcoolica.value
+      };
+
+      fetch(webAppUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || "Resposta enviada!");
+        limparFormulario();
+      });
+    }
+
+    function limparFormulario() {
+      document.getElementById("formularioDiv").style.display = "none";
+      document.getElementById("telefoneDiv").style.display = "none";
+      document.getElementById("conviteDiv").style.display = "none";
+      document.getElementById("nomeInput").value = "";
+      document.getElementById("telefoneInput").value = "";
+      document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    }
+  </script>
+</body>
+</html>
